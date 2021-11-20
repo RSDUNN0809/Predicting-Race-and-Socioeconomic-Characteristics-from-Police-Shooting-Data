@@ -1,0 +1,11 @@
+---
+title: "Final Project"
+author: "Ryan Dunn and Derek Lankeaux
+date: "11/20/2021"
+output: html_document
+---
+
+```{r}
+Police_Shootings <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/Police_Shootings.txt")
+head(Police_Shootings)
+```
