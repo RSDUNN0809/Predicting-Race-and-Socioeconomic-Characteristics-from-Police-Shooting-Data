@@ -6,6 +6,103 @@ output: html_document
 ---
 
 ```{r}
-Police_Shootings <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/Police_Shootings.txt")
-head(Police_Shootings)
+#import the data sets for EDA
+police_post2015 <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PoliceShootings_post2015.txt")
+
+police_pre2015 <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PoliceShootings_pre2015.csv")
+
+median_income <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/MedianHouseholdIncome2015.csv")
+
+poverty_level <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PercentagePeopleBelowPovertyLevel.csv")
+
+race_city <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/ShareRaceByCity.csv")
+
+high_school<- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PercentOver25CompletedHighSchool.csv")
 ```
+
+```{r}
+gender_summary_post <- table(police_post2015$gender)
+
+gender_post <- barplot(gender_summary_post[order(gender_summary_post, decreasing = FALSE)],
+                main = "Deaths by Gender Post-2015",
+                xlab = 'Gender',
+                ylab = 'Deaths')
+text(gender_post,  + 2000 , gender_summary_post, font=1)
+```
+```{r}
+gender_summary_pre <- table(police_pre2015$gender)
+
+gender_pre <- barplot(gender_summary_pre[order(gender_summary_pre, decreasing = FALSE)],
+                main = "Deaths by Gender Pre-2015",
+                xlab = 'Gender',
+                ylab = 'Deaths')
+text(gender_pre,  + 2000 , gender_summary_pre, font=1)
+```
+
+```{r}
+library(ggplot2)
+
+ bar <- ggplot(data = police_post2015) +
+  geom_bar(mapping = aes(x =gender) )
+bar + ggtitle("Death Counts by Gener")
+```
+
+```{r}
+#histogram of age post-2015
+ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5)
+```
+
+```{r}
+#histogram of age post-2015
+ggplot(data = police_pre2015, aes(age)) + geom_histogram(binwidth = 5)
+```
+
+```{r}
+race_summary_post <- table(police_post2015$race)
+
+race_post <- barplot(race_summary_post[order(race_summary_post, decreasing = FALSE)],
+               main = "Deaths by Race Post-2015",
+               xlab = 'Race',
+               ylab = 'Deaths')
+text(race_post, + 100 , race_summary_post, font=1)
+```
+
+```{r}
+race_summary_pre <- table(police_pre2015$race)
+
+race_pre <- barplot(race_summary_pre[order(race_summary_pre, decreasing = FALSE)],
+               main = "Deaths by Race Post-2015",
+               xlab = 'Race',
+               ylab = 'Deaths')
+text(race_pre, + 100 , race_summary_pre, font=1)
+```
+
+```{r}
+#contigency tables and percentages of shooting by race
+cont_table_race <- table(police_post2015$race)
+prop_table_race <- prop.table(cont_table_race) 
+perc_table_race <- prop.table(cont_table_race) * 100
+
+race_table <- rbind(cont_table_race, prop_table_race, perc_table_race)
+race_table
+```
+
+```{r}
+#from: https://www.visualcapitalist.com/visualizing-u-s-population-by-race/
+
+white_pop <- 60.1
+black_pop <- 12.2
+hisp_pop <- 18.5
+asian_pop <- 5.6
+other_pop = 100 - white_pop -black_pop - hisp_pop - asian_pop
+
+other_pop
+```
+
+
+
+
+
+
+
+
