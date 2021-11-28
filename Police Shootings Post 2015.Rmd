@@ -260,7 +260,7 @@ white_pop <- .601 * total_pop
 black_pop <- .122 *total_pop
 hisp_pop <- .185 *total_pop
 asian_pop <- .056 * total_pop
-other_pop = 100 - white_pop -black_pop - hisp_pop - asian_pop
+other_pop <- 100 - white_pop -black_pop - hisp_pop - asian_pop
 
 #develop an object by race of the count of deaths by the population proportion
 white_prop <- (race_table["Count","W"] / white_pop) * 100
