@@ -14,7 +14,7 @@ library(readxl)
 #import the police shootings since 2015 data 
 police_post2015 <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PoliceShootings_post2015.txt")
 
-#import supplementary income, povery, race, and high school graduation data
+#import supplementary income, poverty, race, and high school graduation data for data blending/joining 
 median_income <- read_excel("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/MedianHouseholdIncome2015.xlsx")
 povery_level <- read_excel("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PercentagePeopleBelowPovertyLevel.xlsm")
 race_city <- read_excel("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/ShareRaceByCity.xlsm")
@@ -113,10 +113,10 @@ head(final_df)
 #### Add in a region area by state 
 ```{r}
 final_df <- final_df %>% mutate(Region =
-                     case_when(state == 'AL' ~ 'South',
+                     case_when(state == 'AL' ~ 'Southeast',
                                state == 'AK' ~ 'West',
                                state == 'AZ' ~ 'Southwest',
-                               state == 'AR' ~ 'South',
+                               state == 'AR' ~ 'Southeast',
                                state == 'CA' ~ 'West',
                                state == 'CO' ~ 'West',
                                state == 'CT' ~ 'Northeast',
@@ -287,27 +287,44 @@ ggplot(data=final_df) +
 head(final_df)
 ```
 ### Scatterplot of Lat $ Long by Region
+
 ```{r}
 ggplot(data=final_df) + 
   geom_point(mapping = aes( x = longitude, y = latitude, color = Region))
 ```
 
-### Race and Region Overlay
+### Race and Region Contigency Tables
 
 ```{r}
 race_region_cont <- table(final_df$race,final_df$Region)
 race_region_cont
 ```
+
 ```{r}
 round(prop.table(race_region_cont, margin = 2)*100,1)
 ```
+
+### Bar Chart of Total Police Shootings with Race Overlay
+
 ```{r}
 ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region)) + ggtitle("Stacked Bar Chart of Race and Region")
 ```
 
+```{r}
+#normalized bar chart
+ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region) , position = "fill") + ggtitle("Normalized Stacked Bar Chart of Race and Region")
+```
+### Histograms of Age with Race Overlay
 
+```{r}
+#histogram of age with race underlay
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5) + ggtitle("Histogram of Age with Race Overlay")
+```
 
-
+```{r}
+#histogram of age with race underlay
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5, position = "fill") + ggtitle("Normalized Histogram of Age with Race Overlay")
+```
 
 
 
