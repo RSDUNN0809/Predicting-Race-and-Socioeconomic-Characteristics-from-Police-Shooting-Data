@@ -1,0 +1,298 @@
+---
+title: "Police Shootings"
+author: "Ryan S Dunn and Derek Lankeauz"
+date: "11/28/2021"
+output: pdf_document
+---
+
+### Import the relevent data sets for EDA and model development
+
+```{r}
+#import the data sets for EDA
+library(readxl)
+
+#import the police shootings since 2015 data 
+police_post2015 <- read.csv("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PoliceShootings_post2015.txt")
+
+#import supplementary income, povery, race, and high school graduation data
+median_income <- read_excel("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/MedianHouseholdIncome2015.xlsx")
+povery_level <- read_excel("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PercentagePeopleBelowPovertyLevel.xlsm")
+race_city <- read_excel("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/ShareRaceByCity.xlsm")
+hs_grad <- read_excel("~/Documents/USD MS-ADS/Applied Data Mining 502/Final Project/PercentOver25CompletedHighSchool.xlsm")
+```
+
+#### Import the necessary libraries
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+#### Develop a median income data frame to join onto the police_shootings dataframe
+
+```{r}
+#develop a median income object to join onto the police shootings data frame
+income_df <- data.frame((median_income))
+
+#change data types as needed
+income_df$Median.Income <- as.numeric(income_df$Median.Income)
+income_df$Geographic.Area <- as.factor(income_df$Geographic.Area)
+
+#aggregate the median income via the median median income of each state
+income_table <- aggregate(x = income_df$Median.Income,
+          by = list(income_df$Geographic.Area),
+          FUN =  median)
+
+#save the income_table as a data frame and convert the names of the columns
+income_table <- as.data.frame(income_table)
+income_table <- rename(income_table, "State" = "Group.1")
+income_table <- rename(income_table, "Median.Income" = "x")
+
+#view the developed object
+income_table
+```
+
+#### Develop a povery rate data frame to join onto the police_shootings dataframe
+
+```{r}
+#develop a poverty rate object to join onto the police shootings data frame
+pr_df <- data.frame(povery_level)
+
+#change the data types as needed
+pr_df$poverty_rate  <- as.numeric(pr_df$poverty_rate)
+pr_df$Geographic.Area <- as.factor(pr_df$Geographic.Area)
+
+#aggregate the poverty rate via the median poverty rate of each state
+pr_table <- aggregate(x = pr_df$poverty_rate,
+          by = list(pr_df$Geographic.Area),
+          FUN =  median)
+
+#save the pr_table as a data frame and convert the names of the columns
+pr_table <- as.data.frame(pr_table)
+pr_table  <- rename(pr_table, "State" = "Group.1")
+pr_table <- rename(pr_table, "Median.Below.Poverty" = 'x')
+
+#view the object
+pr_table 
+```
+
+#### Develop a percent of population over 25 years old that has graduated from high school data frame to join onto the police_shootings dataframe
+
+```{r}
+#develop a hs rate object to join onto the police shootings data frame
+hs_df <- data.frame(hs_grad)
+
+#change the data types as needed
+hs_df$Geographic.Area <- as.factor(hs_df$Geographic.Area)
+hs_df$percent_completed_hs <- as.numeric(hs_df$percent_completed_hs)
+
+#aggregate the hs_df as a data frame and covert the names of the columns
+hs_table <- aggregate( x = hs_df$percent_completed_hs, 
+                       by = list(hs_df$Geographic.Area),
+                       FUN = median)
+
+hs_table <- as.data.frame(hs_table)
+hs_table <- rename(hs_table, "State" = "Group.1")
+hs_table <- rename(hs_table, "Over.25.Grad.Rate" = "x")
+
+#view the object
+hs_table
+
+```
+
+#### Join the developed data frame data onto the police shootings data
+
+```{r}
+#develop the final_df object from the police shootings and left joined data from the developed objects
+final_df <- left_join(police_post2015, pr_table, by = c("state" = "State"))
+final_df <- left_join(final_df, income_table, by = c("state" = "State"))
+final_df <- left_join(final_df, hs_table, by = c("state" = "State"))
+
+#create the regional column data frame 
+head(final_df)
+```
+#### Add in a region area by state 
+```{r}
+final_df <- final_df %>% mutate(Region =
+                     case_when(state == 'AL' ~ 'South',
+                               state == 'AK' ~ 'West',
+                               state == 'AZ' ~ 'Southwest',
+                               state == 'AR' ~ 'South',
+                               state == 'CA' ~ 'West',
+                               state == 'CO' ~ 'West',
+                               state == 'CT' ~ 'Northeast',
+                               state == 'DE' ~ 'Northeast',
+                               state == 'DC' ~ 'Southeast',
+                               state == 'FL' ~ 'Southeast',
+                               state == 'GA' ~ 'Southeast',
+                               state == 'GU' ~ 'West',
+                               state == 'HI' ~ 'West',
+                               state == 'ID' ~ 'West',
+                               state == 'IL' ~ 'Midwest',
+                               state == 'IN' ~ 'Midwest',
+                               state == 'IA' ~ 'Midwest',
+                               state == 'KS' ~ 'Midwest',
+                               state == 'KY' ~ 'Southeast',
+                               state == 'LA' ~ 'Southeast',
+                               state == 'ME' ~ 'Northeast',
+                               state == 'MD' ~ 'Northeast',
+                               state == 'MA' ~ 'Northeast',
+                               state == 'MI' ~ 'Midwest',
+                               state == 'MN' ~ 'Midwest',
+                               state == 'MS' ~ 'Southeast',
+                               state == 'MO' ~ 'Midwest',
+                               state == 'MT' ~ 'West',
+                               state == 'NE' ~ 'Midwest',
+                               state == 'NV' ~ 'West',
+                               state == 'NH' ~ 'Northeast',
+                               state == 'NJ' ~ 'Northeast',
+                               state == 'NM' ~ 'Southwest',
+                               state == 'NY' ~ 'Northeast',
+                               state == 'NC' ~ 'Southeast',
+                               state == 'ND' ~ 'Midwest',
+                               state == 'OH' ~ 'Midwest',
+                               state == 'OK' ~ 'Southwest',
+                               state == 'OR' ~ 'West',
+                               state == 'PA' ~ 'Northeast',
+                               state == 'PR' ~ 'Southeast',
+                               state == 'RI' ~ 'Northeast',
+                               state == 'SC' ~ 'Southeast',
+                               state == 'SC' ~ 'Midwest',
+                               state == 'TN' ~ 'Southeast',
+                               state == 'TX' ~ 'Southwest',
+                               state == 'UT' ~ 'West',
+                               state == 'VA' ~ 'Southeast',
+                               state == 'VT' ~ 'Northeast',
+                               state == 'WA' ~ 'West',
+                               state == 'WV' ~ 'Southeast',
+                               state == 'WI' ~ 'Midwest',
+                               state == 'WY' ~ 'West'))
+```
+
+```{r}
+#view the final object 
+head(final_df)
+```
+
+## Begin Exploratory Data Analysis
+
+```{r}
+summary(final_df)
+```
+
+#### Deaths by Gender bar chart
+```{r}
+gender_summary_post <- table(police_post2015$gender)
+
+gender_post <- barplot(gender_summary_post[order(gender_summary_post, decreasing = FALSE)],
+                main = "Deaths by Gender Post-2015",
+                xlab = 'Gender',
+                ylab = 'Deaths')
+text(gender_post,  + 2000 , gender_summary_post, font=1)
+```
+### Deaths by Region 
+```{r}
+cont_table_region <- table(final_df$Region)
+cont_table_region
+```
+
+```{r}
+region_summary_table <- table(final_df$Region)
+
+region_summary <- barplot(region_summary_table[order(region_summary_table, decreasing = FALSE)],
+                main = "Deaths by Region",
+                xlab = 'Region',
+                ylab = 'Deaths')
+```
+
+```{r}
+cont_table_region <- table(final_df$Region)
+cont_table_region
+```
+#### Deaths by Age histogram 
+```{r}
+#histogram of age post-2015
+ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5)
+```
+
+#### Deaths by Race bar chart
+```{r}
+#create a table of the deaths by race
+race_summary_post <- table(police_post2015$race)
+
+#develop the bar chart in decreasing order
+race_post <- barplot(race_summary_post[order(race_summary_post, decreasing = TRUE)],
+               main = "Deaths by Race Post-2015",
+               xlab = 'Race',
+               ylab = 'Deaths')
+
+# W = White, B = Black, H = Hispanic, A = Asian, Empty = Unknown, N = Native American, O = Other 
+```
+
+```{r}
+#return the vector of only the deaths by race category
+race_summary_post
+```
+
+#### Develop contingency tables of police shootings by race, and associated proportions/percentages of whole
+
+```{r}
+#contigency tables and percentages of shooting by race
+cont_table_race <- table(police_post2015$race)
+prop_table_race <- prop.table(cont_table_race) 
+perc_table_race <- prop.table(cont_table_race) * 100
+
+race_table <- rbind(cont_table_race, prop_table_race, perc_table_race)
+rownames(race_table) <- c("Count","Proportion","Percentage")
+race_table
+#race_table["Count", "B"]
+```
+
+#### From the total U.S. Population statistics in 2019, develop the race proporitions of the U.S. and determine the associated distributions of police shootings by race relative to race proportion in the U.S. 
+
+```{r}
+#from: https://www.visualcapitalist.com/visualizing-u-s-population-by-race/ -- retrieve U.S. Population and Demographic data
+
+#estimated U.S. Populations as of 2019
+total_pop <- 328239523
+
+#estimated U.S. race demographic proportions
+white_pop <- .601 * total_pop
+black_pop <- .122 *total_pop
+hisp_pop <- .185 *total_pop
+asian_pop <- .056 * total_pop
+other_pop = 100 - white_pop -black_pop - hisp_pop - asian_pop
+
+#develop an object by race of the count of deaths by the population proportion
+white_prop <- (race_table["Count","W"] / white_pop) * 100
+black_prop <- (race_table["Count","B"] / black_pop) * 100
+hisp_prop <-  (race_table["Count","H"] / hisp_pop)  * 100
+asian_prop <- (race_table["Count","A"] / asian_pop) * 100 
+```
+
+```{r}
+#print the developed race proportions of deaths by police shooting
+print(black_prop)
+print(hisp_prop)
+print(white_prop)
+print(asian_prop)
+```
+
+### Scatterplot of HS Grad Rate, Median Below Povery by Region
+```{r}
+ggplot(data=final_df) + 
+  geom_point(mapping = aes( x = Median.Below.Poverty, y = Over.25.Grad.Rate, color = Region)) + ggtitle("Scatterplot") + xlab("Median Below Poverty Rate") + ylab("Percent of age 25 HS grad") 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
