@@ -278,14 +278,32 @@ print(asian_prop)
 ```
 
 ### Scatterplot of HS Grad Rate, Median Below Povery by Region
+
 ```{r}
 ggplot(data=final_df) + 
   geom_point(mapping = aes( x = Median.Below.Poverty, y = Over.25.Grad.Rate, color = Region)) + ggtitle("Scatterplot") + xlab("Median Below Poverty Rate") + ylab("Percent of age 25 HS grad") 
 ```
+```{r}
+head(final_df)
+```
+### Scatterplot of Lat $ Long by Region
+```{r}
+ggplot(data=final_df) + 
+  geom_point(mapping = aes( x = longitude, y = latitude, color = Region))
+```
 
+### Race and Region Overlay
 
-
-
+```{r}
+race_region_cont <- table(final_df$race,final_df$Region)
+race_region_cont
+```
+```{r}
+round(prop.table(race_region_cont, margin = 2)*100,1)
+```
+```{r}
+ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region)) + ggtitle("Stacked Bar Chart of Race and Region")
+```
 
 
 
