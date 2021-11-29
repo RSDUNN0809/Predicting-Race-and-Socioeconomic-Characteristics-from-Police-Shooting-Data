@@ -1,8 +1,10 @@
 ---
-title: "Police Shootings"
+title: "Police Shootings" 
 author: "Ryan S Dunn and Derek Lankeauz"
-date: "11/28/2021"
-output: pdf_document
+date: "11/28/2021" 
+output:
+  html_document:
+    df_print: paged
 ---
 
 ### Import the relevent data sets for EDA and model development
@@ -99,7 +101,7 @@ hs_table
 
 ```
 
-#### Join the developed data frame data onto the police shootings data
+#### Join the developed data frame data onto the police shootings data 
 
 ```{r}
 #develop the final_df object from the police shootings and left joined data from the developed objects
