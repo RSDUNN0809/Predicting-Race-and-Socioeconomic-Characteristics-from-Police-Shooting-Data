@@ -1,8 +1,9 @@
 ---
-title: "Police Shootings" 
+title: "Police Shootings"
 author: "Ryan S Dunn and Derek Lankeauz"
-date: "11/28/2021" 
+date: "11/28/2021"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -158,7 +159,7 @@ final_df <- final_df %>% mutate(Region =
                                state == 'PR' ~ 'Southeast',
                                state == 'RI' ~ 'Northeast',
                                state == 'SC' ~ 'Southeast',
-                               state == 'SC' ~ 'Midwest',
+                               state == 'SD' ~ 'Midwest',
                                state == 'TN' ~ 'Southeast',
                                state == 'TX' ~ 'Southwest',
                                state == 'UT' ~ 'West',
@@ -167,14 +168,40 @@ final_df <- final_df %>% mutate(Region =
                                state == 'WA' ~ 'West',
                                state == 'WV' ~ 'Southeast',
                                state == 'WI' ~ 'Midwest',
-                               state == 'WY' ~ 'West'))
+                               state == 'WY' ~ 'West')) 
 ```
 
 ```{r}
-#view the final object 
-head(final_df)
+final_df <- final_df %>% mutate(Armed.Flag =
+                     case_when(armed == 'undertermed' ~ '0',
+                               armed == 'unarmed' ~ '0',
+                               armed == 'NA' ~ '0'))
+#repalce all NA's in the Armed.Flag with a 1 flag
+final_df[is.na(final_df)] <- 1 
 ```
 
+```{r}
+#develop an attribute that depicts if a person is a minority or not
+final_df <- final_df %>% mutate(Is.Minority = 
+                                  case_when(race == 'W' ~ '0'))
+final_df[is.na(final_df)] <- '1'
+```
+
+```{r}
+#display a contigency table to review that the output of the above mutation is correct
+a <- table(final_df$race, final_df$Is.Minority)
+a
+```
+## Fleeing Contigency Tables 
+```{r}
+#table for armed
+armed_table <- table(final_df$Armed.Flag, final_df$race)
+armed_table
+```
+
+```{r}
+round(prop.table(armed_table, margin = 2)*100,1)
+```
 ## Begin Exploratory Data Analysis
 
 ```{r}
@@ -204,6 +231,7 @@ region_summary <- barplot(region_summary_table[order(region_summary_table, decre
                 main = "Deaths by Region",
                 xlab = 'Region',
                 ylab = 'Deaths')
+text(region_summary,  + 200 , region_summary_table, font=1)
 ```
 
 ```{r}
@@ -213,7 +241,7 @@ cont_table_region
 #### Deaths by Age histogram 
 ```{r}
 #histogram of age post-2015
-ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5)
+ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5, color='black'  ,fill ='lightblue') + ggtitle("oof") +labs(x ='Age of Shooting Victim', y = 'Count of Victims')
 ```
 
 #### Deaths by Race bar chart
@@ -283,7 +311,7 @@ print(asian_prop)
 
 ```{r}
 ggplot(data=final_df) + 
-  geom_point(mapping = aes( x = Median.Below.Poverty, y = Over.25.Grad.Rate, color = Region)) + ggtitle("Scatterplot") + xlab("Median Below Poverty Rate") + ylab("Percent of age 25 HS grad") 
+  geom_point(mapping = aes( x = Median.Below.Poverty, y = Over.25.Grad.Rate, color = Region)) + ggtitle("Scatterplot") + xlab("Median Below Poverty Rate") + ylab("% of Population over 25 -HS Grads") 
 ```
 ```{r}
 head(final_df)
@@ -320,12 +348,12 @@ ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region) , position = "fill") + g
 
 ```{r}
 #histogram of age with race underlay
-ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5) + ggtitle("Histogram of Age with Race Overlay")
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5) + ggtitle("Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims')
 ```
 
 ```{r}
 #histogram of age with race underlay
-ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5, position = "fill") + ggtitle("Normalized Histogram of Age with Race Overlay")
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5, position = "fill") + ggtitle("Normalized Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims')
 ```
 
 
