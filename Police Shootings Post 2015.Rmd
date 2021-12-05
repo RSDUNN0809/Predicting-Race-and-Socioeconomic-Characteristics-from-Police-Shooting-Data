@@ -1,5 +1,5 @@
 ---
-title: "Police Shootings"
+title: "Police Shootings"  
 author: "Ryan S Dunn and Derek Lankeauz"
 date: "11/28/2021"
 output:
@@ -218,6 +218,12 @@ gender_post <- barplot(gender_summary_post[order(gender_summary_post, decreasing
                 ylab = 'Deaths')
 text(gender_post,  + 2000 , gender_summary_post, font=1)
 ```
+
+```{r}
+#police shootings by gender box chart 
+ggplot(final_df, aes(gender)) + geom_bar(aes(fill= Is.Minority)) + ggtitle("Stacked Bar Chart by Gender with Minority Overlay") +
+  scale_fill_manual(values = c("blue","lightblue")) + labs(x="Gender", y="Count of Deaths")
+```
 ### Deaths by Region 
 ```{r}
 cont_table_region <- table(final_df$Region)
@@ -225,13 +231,11 @@ cont_table_region
 ```
 
 ```{r}
-region_summary_table <- table(final_df$Region)
+#bar chart with deaths by region with minority overlay
+ggplot(final_df, aes(Region)) + geom_bar(aes(fill= Is.Minority)) + ggtitle("Stacked Bar Chart by Region with Minority Overlay") +
+  scale_fill_manual(values = c("blue","lightblue")) + labs(x="Region", y="Count of Deaths")
 
-region_summary <- barplot(region_summary_table[order(region_summary_table, decreasing = FALSE)],
-                main = "Deaths by Region",
-                xlab = 'Region',
-                ylab = 'Deaths')
-text(region_summary,  + 200 , region_summary_table, font=1)
+region_summary_table <- table(final_df$Region)
 ```
 
 ```{r}
@@ -241,7 +245,7 @@ cont_table_region
 #### Deaths by Age histogram 
 ```{r}
 #histogram of age post-2015
-ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5, color='black'  ,fill ='lightblue') + ggtitle("oof") +labs(x ='Age of Shooting Victim', y = 'Count of Victims')
+ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5, color='black'  ,fill ='lightblue') + ggtitle("Histogram of Police Shooting Victims by Age") +labs(x ='Age of Shooting Victim', y = 'Count of Victims')
 ```
 
 #### Deaths by Race bar chart
@@ -337,27 +341,32 @@ round(prop.table(race_region_cont, margin = 2)*100,1)
 ### Bar Chart of Total Police Shootings with Race Overlay
 
 ```{r}
-ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region)) + ggtitle("Stacked Bar Chart of Race and Region")
+ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region)) + ggtitle("Stacked Bar Chart of Race and Region") +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue"))
 ```
 
 ```{r}
 #normalized bar chart
-ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region) , position = "fill") + ggtitle("Normalized Stacked Bar Chart of Race and Region")
+ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region) , position = "fill") + ggtitle("Normalized Stacked Bar Chart of Race and Region") +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue"))
 ```
 ### Histograms of Age with Race Overlay
 
 ```{r}
 #histogram of age with race underlay
-ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5) + ggtitle("Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims')
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5) + ggtitle("Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims') +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue","cyan","cyan4"))
 ```
 
 ```{r}
 #histogram of age with race underlay
-ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5, position = "fill") + ggtitle("Normalized Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims')
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5, position = "fill") + ggtitle("Normalized Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims') +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue","cyan","cyan4"))
 ```
 
+```{r}
+ggplot(final_df, aes(Region)) + geom_bar(aes(fill=race)) + ggtitle("Stacked Bar Chart of Race and Region") + scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue","cyan","cyan4"))
+```
 
-
+```{r}
+ggplot(data =final_df, mapping = aes(x=race, y = age)) + geom_boxplot() + ggtitle("Boxplot of Age of Police Victims by Race")
+```
 
 
 
