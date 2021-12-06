@@ -1,7 +1,7 @@
 ---
 title: "Predicting Race and Socioeconomic Characteristics from Police Shooting Data"   
 author: "Ryan S Dunn and Derek Lankeauz"
-date: "11/28/2021"
+date: "11/28/2021"  
 output:
   pdf_document: default
   html_document:
@@ -370,6 +370,7 @@ ggplot(data =final_df, mapping = aes(x=race, y = age)) + geom_boxplot() + ggtitl
 
 ## Begin Machine Learning Models 
 
+#### Partition the data 
 ```{r}
 #partition the data - set seed for the random number generator
 set.seed(7)
@@ -420,11 +421,13 @@ cart01 <- rpart(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed
 predict_race = predict(object = cart01, newdata = cart_test, type ="class")
 
 #develop a contingency table of the predicted and actual races of the CART algorithm 
-cart_contigency <- table(cart_test$Is.Minority , predict_race)
-cart_contigency
+cart_contingency <- table(cart_test$Is.Minority , predict_race)
+colnames(cart_contingency) <- c("Predicted No", "Predicted Yes")
+row.names(cart_contingency) <- c("Actual No", "Actual Yes")
+cart_contingency
 ```
 
-### C5.0 Algorithm 
+### C5.0 Algorithm  
 
 ```{r}
 #assign the data sets
@@ -456,6 +459,8 @@ C5_predictions <- predict(object = C5, newdata = c50_test)
 
 #develop a contingency table for the actual and predicted values 
 c5_contingency <- table(c50_test$Is.Minority, C5_predictions)
+colnames(c5_contingency) <- c("Predicted No", "Predicted Yes")
+row.names(c5_contingency) <- c("Actual No", "Actual Yes")
 c5_contingency
 ```
 
@@ -479,8 +484,10 @@ rf01 <- randomForest(formula = Is.Minority ~ signs_of_mental_illness + Region + 
 rf_predictions <- predict(object = rf01, newdata = rf_test)
 
 #develop a contingency table for the actual and predicted values 
-rf_contigency <- table(rf_test$Is.Minority, rf_predictions)
-rf_contigency
+rf_contingency <- table(rf_test$Is.Minority, rf_predictions)
+colnames(rf_contingency) <- c("Predicted No", "Predicted Yes")
+row.names(rf_contingency) <- c("Actual No", "Actual Yes")
+rf_contingency
 ```
 
 ### Navie Bayes Classifcation 
@@ -503,8 +510,10 @@ nb01 <- naiveBayes(formula = Is.Minority ~ signs_of_mental_illness + Region + Ar
 nb_predictions <- predict(object=nb01, newdata = nb_test)
 
 #develop a contingency table for the actual and predicted values 
-nb_contignecy <- table(nb_test$Is.Minority , nb_predictions)
-nb_contignecy
+nb_contingency <- table(nb_test$Is.Minority , nb_predictions)
+colnames(nb_contingency) <- c("Predicted No", "Predicted Yes")
+row.names(nb_contingency) <- c("Actual No", "Actual Yes")
+nb_contingency
 ```
 
 ### Artificial Neural Network 
@@ -538,10 +547,155 @@ plotnet(nnet01)
 ```
 
 ```{r}
-nn_predictions <- table(ann_test$Is.Minority , predict(nnet01, type = "class", newdata = ann_test))
+nn_contingency <- table(ann_test$Is.Minority , predict(nnet01, type = "class", newdata = ann_test))
 
 
-colnames(nn_predictions) <- c("Predicted No", "Predicted Yes")
-row.names(nn_predictions) <- c("Actual No", "Actual Yes")
-nn_predictions
+colnames(nn_contingency) <- c("Predicted No", "Predicted Yes")
+row.names(nn_contingency) <- c("Actual No", "Actual Yes")
+nn_contingency
 ```
+
+### Evaluation Metrics 
+```{r}
+#display all contingency matrices
+cart_contigency
+c5_contingency
+rf_contigency
+nb_contignecy
+nn_contigency
+```
+
+#### CART Evaluation 
+```{r}
+#develop the cart metrics to input into the confusion matrix
+TP_cart <- cart_contingency[1,1]
+FN_cart <- cart_contingency[1,2]
+FP_cart <- cart_contingency[2,1]
+TN_cart <- cart_contingency[2,2]
+
+#totals for the corresponding row and column values of confusion matrix
+TAN_cart <- FP_cart + TN_cart
+TAP_cart <- TP_cart + FN_cart
+TPN_cart <- TN_cart + FN_cart
+TPP_cart <- FP_cart + TP_cart
+GT_cart<- TP_cart + FN_cart + FP_cart + TN_cart
+
+#generate the evaluation metrics for cart
+accuracy_cart <- round((TN_cart + TP_cart) / (GT_cart),4)
+error_rate_sensitivity_cart <- (1 - accuracy_cart)
+specificity_cart <- round((TN_cart/TAN_cart),4)
+precision_cart <- round((TP_cart/TPP_cart),4)
+f1_cart <- round(2* ((precision_cart * specificity_cart) / (precision_cart + specificity_cart)),4) 
+```
+
+#### C5.0 Evaluation
+```{r}
+#develop the c5.0 metrics to input into the confusion matrix
+TP_c5 <- c5_contingency[1,1]
+FN_c5 <- c5_contingency[1,2]
+FP_c5 <- c5_contingency[2,1]
+TN_c5 <- c5_contingency[2,2]
+
+#totals for the corresponding row and column values of confusion matrix
+TAN_c5 <- FP_c5 + TN_c5
+TAP_c5 <- TP_c5 + FN_c5
+TPN_c5 <- TN_c5 + FN_c5
+TPP_c5 <- FP_c5 + TP_c5
+GT_c5 <- TP_c5 + FN_c5 + FP_c5 + TN_c5
+
+#generate the evaluation metrics for c5.0
+accuracy_c5 <- round((TN_c5 + TP_c5) / (GT_c5),4)
+error_rate_sensitivity_c5 <- (1 - accuracy_c5)
+specificity_c5 <- round((TN_c5/TAN_c5),4)
+precision_c5 <- round((TP_c5/TPP_c5),4)
+f1_c5 <- round(2* ((precision_c5 * specificity_c5) / (precision_c5 + specificity_c5)),4) 
+```
+
+#### Random Forest Evaluation 
+```{r}
+#develop the random forest metrics to input into the confusion matrix
+TP_rf <- rf_contingency[1,1]
+FN_rf <- rf_contingency[1,2]
+FP_rf <- rf_contingency[2,1]
+TN_rf <- rf_contingency[2,2]
+
+#totals for the corresponding row and column values of confusion matrix
+TAN_rf <- FP_rf + TN_rf
+TAP_rf <- TP_rf + FN_rf
+TPN_rf <- TN_rf + FN_rf
+TPP_rf <- FP_rf + TP_rf
+GT_rf <- TP_rf + FN_rf + FP_rf + TN_rf
+
+#generate the evaluation metrics for random forest
+accuracy_rf <- round((TN_rf + TP_rf) / (GT_rf),4)
+error_rate_sensitivity_rf <- (1 - accuracy_rf)
+specificity_rf <- round((TN_rf/TAN_rf),4)
+precision_rf <- round((TP_rf/TPP_rf),4)
+f1_rf <- round(2* ((precision_rf * specificity_rf) / (precision_rf + specificity_rf)),4) 
+```
+
+#### Naive Bayes Evaluation 
+```{r}
+#develop the naive bayes metrics to input into the confusion matrix
+TP_nb <- nb_contingency[1,1]
+FN_nb <- nb_contingency[1,2]
+FP_nb <- nb_contingency[2,1]
+TN_nb <- nb_contingency[2,2]
+
+#totals for the corresponding row and column values of confusion matrix
+TAN_nb <- FP_nb + TN_nb
+TAP_nb <- TP_nb + FN_nb
+TPN_nb <- TN_nb + FN_nb
+TPP_nb <- FP_nb + TP_nb
+GT_nb <- TP_nb + FN_nb + FP_nb + TN_nb
+
+#generate the evaluation metrics for naive bayes
+accuracy_nb <- round((TN_nb + TP_nb) / (GT_nb),4)
+error_rate_sensitivity_nb <- (1 - accuracy_nb)
+specificity_nb <- round((TN_nb/TAN_nb),4)
+precision_nb <- round((TP_nb/TPP_nb),4)
+f1_nb <- round(2* ((precision_nb * specificity_nb) / (precision_nb + specificity_nb)),4) 
+```
+
+#### Neural Network Evaluation 
+```{r}
+#develop the neural network metrics to input into the confusion matrix
+TP_nn <- nn_contingency[1,1]
+FN_nn <- nn_contingency[1,2]
+FP_nn <- nn_contingency[2,1]
+TN_nn <- nn_contingency[2,2]
+
+#totals for the corresponding row and column values of confusion matrix
+TAN_nn <- FP_nn + TN_nn
+TAP_nn <- TP_nn + FN_nn
+TPN_nn <- TN_nn + FN_nn
+TPP_nn <- FP_nn + TP_nn
+GT_nn <- TP_nn + FN_nn + FP_nn + TN_nn
+
+#generate the evaluation metrics for neural network
+accuracy_nn <- round((TN_nn + TP_nn) / (GT_nn),4)
+error_rate_sensitivity_nn <- (1 - accuracy_nn)
+specificity_nn <- round((TN_nn/TAN_nn),4)
+precision_nn <- round((TP_nn/TPP_nn),4)
+f1_nn <- round(2* ((precision_nn * specificity_nn) / (precision_nn + specificity_nn)),4) 
+```
+
+### Put all metrics into one matrix
+```{r} 
+#create a matrix to compare the model side by side
+model_eval_table <- matrix(c(accuracy_cart, accuracy_c5, accuracy_nb, accuracy_rf,accuracy_nn,
+                             specificity_cart, specificity_c5, specificity_nb, specificity_rf, specificity_nn,
+                             precision_cart, precision_c5, precision_nb, precision_rf, precision_nn,
+                           f1_cart, f1_c5, f1_nb, f1_rf, f1_nn),
+                           ncol = 5, nrow =4, byrow = TRUE)
+
+#develop the column and row names
+colnames(model_eval_table) <- c("CART Model", "C5.0 Model", "Naive Bayes Model", "Random Forest Model","Neural Network Model")
+row.names(model_eval_table) <- c("Accuracy","Specificity","Precision","F1")
+
+print(model_eval_table)
+```
+
+
+
+
