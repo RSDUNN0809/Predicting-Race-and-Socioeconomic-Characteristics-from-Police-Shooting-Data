@@ -370,3 +370,178 @@ ggplot(data =final_df, mapping = aes(x=race, y = age)) + geom_boxplot() + ggtitl
 
 ## Begin Machine Learning Models 
 
+```{r}
+#partition the data - set seed for the random number generator
+set.seed(7)
+
+#return how many records are in the data set
+n <- dim(final_df)[1]
+n
+```
+```{r}
+training_index <- runif(n) < 0.75
+
+shootings_train <- final_df[training_index,]
+shootings_test <- final_df[!training_index,]
+
+#validate the data has been partitioned into two data sets - a training of 0.75 and test of 0.25
+dim(shootings_train)
+dim(shootings_test)
+```
+### CART Decision Tree Algorithm 
+```{r}
+#develop two data frames for the CART Decision Tree Algorithm from the original dataframes
+cart_training <- shootings_train
+cart_test <- shootings_test
+
+#set categorical variables to factors (training)
+cart_training$signs_of_mental_illness <- factor(cart_training$signs_of_mental_illness)
+cart_training$Region <- factor(cart_training$Region)
+cart_training$Armed.Flag <- factor(cart_training$Armed.Flag)
+
+#set categorical variables to factors (test)
+cart_test$signs_of_mental_illness <- factor(cart_test$signs_of_mental_illness)
+cart_test$Region <- factor(cart_test$Region)
+cart_test$Armed.Flag <- factor(cart_test$Armed.Flag)
+```
+
+```{r}
+#import the C5.0 algorithm library
+library(rpart)
+```
+
+```{r}
+#develop the CART algorithm 
+cart01 <- rpart(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = cart_training, method = "class")
+```
+
+```{r}
+#apply the cart01 model to the test dataset
+predict_race = predict(object = cart01, newdata = cart_test, type ="class")
+
+#develop a contingency table of the predicted and actual races of the CART algorithm 
+cart_contigency <- table(cart_test$Is.Minority , predict_race)
+cart_contigency
+```
+
+### C5.0 Algorithm 
+
+```{r}
+#assign the data sets
+c50_train <- cart_training
+c50_test <- cart_test
+
+#turn the outcome variable into a factor 
+c50_train$Is.Minority <- factor(c50_train$Is.Minority)
+c50_test$Is.Minority <- factor(c50_test$Is.Minority)
+```
+
+```{r}
+#import the C5.0 algorithm library
+library(C50)
+```
+
+```{r}
+#develop the C5.0 algorithm 
+C5 <- C5.0(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = c50_train, minCases=50)
+```
+
+```{r}
+#plot the C5 algorithm 
+plot(C5)
+```
+
+```{r}
+C5_predictions <- predict(object = C5, newdata = c50_test)
+
+#develop a contingency table for the actual and predicted values 
+c5_contingency <- table(c50_test$Is.Minority, C5_predictions)
+c5_contingency
+```
+
+### Random Forests Algorithm 
+```{r}
+#import the randomForest library
+library(randomForest)
+
+#prep the random forest data as necessary 
+rf_train <- c50_train
+rf_test <- c50_test
+```
+
+```{r}
+#develop the random forests algorithm 
+rf01 <- randomForest(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = c50_train, ntree = 500, type = "classification")
+```
+
+```{r}
+#predict the random forests
+rf_predictions <- predict(object = rf01, newdata = rf_test)
+
+#develop a contingency table for the actual and predicted values 
+rf_contigency <- table(rf_test$Is.Minority, rf_predictions)
+rf_contigency
+```
+
+### Navie Bayes Classifcation 
+```{r}
+#import the Naive Bayes library
+library(e1071)
+
+#prep the Naive Bayes data as necessary
+nb_train <- rf_train  
+nb_test <- rf_test
+```
+
+```{r}
+#develop the random forests algorithm
+nb01 <- naiveBayes(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = nb_train)
+```
+
+```{r}
+#predict the naive bayes
+nb_predictions <- predict(object=nb01, newdata = nb_test)
+
+#develop a contingency table for the actual and predicted values 
+nb_contignecy <- table(nb_test$Is.Minority , nb_predictions)
+nb_contignecy
+```
+
+### Artificial Neural Network 
+```{r}
+#import the ANN library
+library(nnet)
+library(NeuralNetTools)
+
+#prep the ANN data as necessary 
+ann_train <- nb_train
+ann_test <- nb_test
+
+#normalize the quantitative variables 
+ann_train$Median.Below.Poverty <- (ann_train$Median.Below.Poverty - min(ann_train$Median.Below.Poverty)) / (max(ann_train$Median.Below.Poverty) - min(ann_train$Median.Below.Poverty))
+ann_train$Median.Income <- (ann_train$Median.Income - min(ann_train$Median.Income)) / (max(ann_train$Median.Income) - min(ann_train$Median.Income))
+ann_train$Over.25.Grad.Rate <- (ann_train$Over.25.Grad.Rate - min(ann_train$Over.25.Grad.Rate)) / (max(ann_train$Over.25.Grad.Rate) - min(ann_train$Over.25.Grad.Rate))
+
+ann_test$Median.Below.Poverty <- (ann_test$Median.Below.Poverty - min(ann_test$Median.Below.Poverty)) / (max(ann_test$Median.Below.Poverty) - min(ann_test$Median.Below.Poverty))
+ann_test$Median.Income <- (ann_test$Median.Income - min(ann_test$Median.Income)) / (max(ann_test$Median.Income) - min(ann_test$Median.Income))
+ann_test$Over.25.Grad.Rate <- (ann_test$Over.25.Grad.Rate - min(ann_test$Over.25.Grad.Rate)) / (max(ann_test$Over.25.Grad.Rate) - min(ann_test$Over.25.Grad.Rate))
+```
+
+```{r}
+#develop the neural network
+nnet01 <- nnet(Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = ann_train, size = 2)
+```
+
+```{r}
+#plot the neural net
+plotnet(nnet01)
+```
+
+```{r}
+nn_predictions <- table(ann_test$Is.Minority , predict(nnet01, type = "class", newdata = ann_test))
+
+
+colnames(nn_predictions) <- c("Predicted No", "Predicted Yes")
+row.names(nn_predictions) <- c("Actual No", "Actual Yes")
+nn_predictions
+```
