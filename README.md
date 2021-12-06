@@ -14,10 +14,10 @@ Analysis was done using the R Programming Language
 * Data Visualization
 * Data Engineering
 * Data Manipulation
-* Machine Learning
+* Machine Learning Models (CART, C5.0, Random Forest, Naive Bayes, Neural Networks)
 
 ## Technologies:
-R Programming Language
+R Programming Language, R Markdown
 
 ## Source Data:
 The Washington Post. (2021, December). Fatal Force. https://www.washingtonpost.com/graphics/investigations/police-shootings-database/ 
