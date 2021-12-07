@@ -26,4 +26,4 @@ The Washington Post. (2021, December). Fatal Force. https://www.washingtonpost.c
 Fatal Police Shootings in the U.S. (Karolina Wullum, 2017).  Kaggle. https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us 
 
 ## Authors and acknowledgement
-Ryan S. Dunn and Derek Lankeaux
+Ryan S. Dunn 
