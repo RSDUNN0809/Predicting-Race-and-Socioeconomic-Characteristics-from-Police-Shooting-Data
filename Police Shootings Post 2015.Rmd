@@ -1,15 +1,16 @@
 ---
-title: "Predicting Race and Socioeconomic Characteristics from Police Shooting Data"   
-author: "Ryan S Dunn and Derek Lankeauz"
-date: "11/28/2021"  
+title: "Appendix"
+author: "Ryan S Dunn"
+date: "11/28/2021"
 output:
-  pdf_document: default
+  word_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 ## Data Importing and Engineering
 
-## Import the relevent data sets for EDA and model development
+### Import the relevent data sets for EDA and model development
 ```{r}
 #import the data sets for EDA
 library(readxl)
@@ -219,7 +220,8 @@ round(prop.table(armed_table, margin = 2)*100,1)
 ```{r}
 gender_summary_post <- table(police_post2015$gender)
 
-gender_post <- barplot(gender_summary_post[order(gender_summary_post, decreasing = FALSE)],
+gender_post <- barplot(gender_summary_post[order(gender_summary_post, 
+                                                 decreasing = FALSE)],
                 main = "Deaths by Gender Post-2015",
                 xlab = 'Gender',
                 ylab = 'Deaths')
@@ -228,8 +230,10 @@ text(gender_post,  + 2000 , gender_summary_post, font=1)
 
 ```{r}
 #police shootings by gender bar chart using ggplot with minority overlay
-ggplot(final_df, aes(gender)) + geom_bar(aes(fill= Is.Minority)) + ggtitle("Stacked Bar Chart by Gender with Minority Overlay") +
-  scale_fill_manual(values = c("blue","lightblue")) + labs(x="Gender", y="Count of Deaths")
+ggplot(final_df, aes(gender)) + geom_bar(aes(fill= Is.Minority)) + 
+  ggtitle("Stacked Bar Chart by Gender with Minority Overlay") +
+  scale_fill_manual(values = c("blue","lightblue")) + labs(x="Gender", 
+                                                           y="Count of Deaths")
 ```
 #### Deaths by Region 
 ```{r}
@@ -240,8 +244,10 @@ cont_table_region
 
 ```{r}
 #bar chart with deaths by region with minority overlay using ggplot
-ggplot(final_df, aes(Region)) + geom_bar(aes(fill= Is.Minority)) + ggtitle("Stacked Bar Chart by Region with Minority Overlay") +
-  scale_fill_manual(values = c("blue","lightblue")) + labs(x="Region", y="Count of Deaths")
+ggplot(final_df, aes(Region)) + geom_bar(aes(fill= Is.Minority)) + 
+  ggtitle("Stacked Bar Chart by Region with Minority Overlay") +
+  scale_fill_manual(values = c("blue","lightblue")) + labs(x="Region", 
+                                                           y="Count of Deaths")
 
 region_summary_table <- table(final_df$Region)
 ```
@@ -249,7 +255,10 @@ region_summary_table <- table(final_df$Region)
 #### Deaths by Age histogram 
 ```{r}
 #histogram of age post-2015
-ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5, color='black'  ,fill ='lightblue') + ggtitle("Histogram of Police Shooting Victims by Age") +labs(x ='Age of Shooting Victim', y = 'Count of Victims')
+ggplot(data = police_post2015, aes(age)) + 
+  geom_histogram(binwidth = 5, color='black',fill ='lightblue') + 
+  ggtitle("Histogram of Police Shooting Victims by Age") + 
+  labs(x ='Age of Shooting Victim', y = 'Count of Victims')
 ```
 
 #### Deaths by Race bar chart
@@ -258,12 +267,14 @@ ggplot(data = police_post2015, aes(age)) + geom_histogram(binwidth = 5, color='b
 race_summary_post <- table(police_post2015$race)
 
 #develop the bar chart in decreasing order
-race_post <- barplot(race_summary_post[order(race_summary_post, decreasing = TRUE)],
+race_post <- barplot(race_summary_post[order(race_summary_post, 
+                                             decreasing = TRUE)],
                main = "Deaths by Race Post-2015",
                xlab = 'Race',
                ylab = 'Deaths')
 
-# W = White, B = Black, H = Hispanic, A = Asian, Empty = Unknown, N = Native American, O = Other 
+# W = White, B = Black, H = Hispanic, A = Asian, 
+# Empty = Unknown, N = Native American, O = Other 
 ```
 
 ```{r}
@@ -274,7 +285,7 @@ race_summary_post
 #### Develop contingency tables of police shootings by race, and associated proportions/percentages of whole
 
 ```{r}
-#contigency tables and percentages of shooting by race
+#contingency tables and percentages of shooting by race
 cont_table_race <- table(police_post2015$race)
 prop_table_race <- prop.table(cont_table_race) 
 perc_table_race <- prop.table(cont_table_race) * 100
@@ -318,7 +329,10 @@ print(asian_prop)
 #### Scatterplot of HS Grad Rate, Median Below Povery by Region
 ```{r}
 ggplot(data=final_df) + 
-  geom_point(mapping = aes( x = Median.Below.Poverty, y = Over.25.Grad.Rate, color = Region)) + ggtitle("Scatterplot") + xlab("Median Below Poverty Rate") + ylab("% of Population over 25 -HS Grads") 
+  geom_point(mapping = aes( x = Median.Below.Poverty, 
+                            y = Over.25.Grad.Rate, color = Region)) + 
+  ggtitle("Scatterplot") + xlab("Median Below Poverty Rate") + 
+  ylab("% of Population over 25 -HS Grads") 
 ```
 
 #### Scatterplot of Lat $ Long by Region
@@ -341,22 +355,28 @@ round(prop.table(race_region_cont, margin = 2)*100,1)
 
 #### Bar Chart of Total Police Shootings with Race Overlay
 ```{r}
-ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region)) + ggtitle("Stacked Bar Chart of Race and Region") +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue"))
+ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region)) + 
+  ggtitle("Stacked Bar Chart of Race and Region") +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue")) +
+  labs( x = 'Race of Shooting Victim' , y='Count of Victims')
 ```
 
 ```{r}
 #normalized bar chart
-ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region) , position = "fill") + ggtitle("Normalized Stacked Bar Chart of Race and Region") +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue"))
+ggplot(final_df, aes(race)) + geom_bar(aes(fill=Region) , position = "fill") + 
+  ggtitle("Normalized Stacked Bar Chart of Race and Region") +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue"))
 ```
 #### Histograms of Age with Race Overlay
 ```{r}
 #histogram of age with race underlay
-ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5) + ggtitle("Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims') +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue","cyan","cyan4"))
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5) + 
+  ggtitle("Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims') +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue","cyan","cyan4")) 
 ```
 
 ```{r}
 #histogram of age with race underlay
-ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", binwidth = 5, position = "fill") + ggtitle("Normalized Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims') +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue","cyan","cyan4"))
+ggplot(final_df, aes(age)) + geom_histogram(aes(fill=race), color="black", 
+                                            binwidth = 5, position = "fill") + 
+  ggtitle("Normalized Histogram of Age with Race Overlay") +labs( x = 'Age of Shooting Victim' , y='Count of Victims') +  scale_fill_manual(values=c("darkgrey","grey","lightblue","blue","darkblue","cyan","cyan4"))
 ```
 #### Stacked Bar Chart of Deahts by Region with Race Overlay
 ```{r}
@@ -364,7 +384,8 @@ ggplot(final_df, aes(Region)) + geom_bar(aes(fill=race)) + ggtitle("Stacked Bar 
 ```
 #### Boxplot of Age & Race
 ```{r}
-ggplot(data =final_df, mapping = aes(x=race, y = age)) + geom_boxplot() + ggtitle("Boxplot of Age of Police Victims by Race") + labs(x="Race of Victim", y="Age")
+ggplot(data =final_df, mapping = aes(x=race, y = age)) + geom_boxplot() + 
+  ggtitle("Boxplot of Age of Police Victims by Race") + labs(x="Race of Victim", y="Age")
 ```
 ##### End EDA
 
@@ -399,21 +420,31 @@ cart_test <- shootings_test
 cart_training$signs_of_mental_illness <- factor(cart_training$signs_of_mental_illness)
 cart_training$Region <- factor(cart_training$Region)
 cart_training$Armed.Flag <- factor(cart_training$Armed.Flag)
+#cart_training$Median.Below.Poverty <- factor(cart_training$Median.Below.Poverty)
+#cart_training$Median.Income <- factor(cart_training$Median.Income)
+#cart_training$Over.25.Grad.Rate <- factor(cart_training$Over.25.Grad.Rate)
 
 #set categorical variables to factors (test)
 cart_test$signs_of_mental_illness <- factor(cart_test$signs_of_mental_illness)
 cart_test$Region <- factor(cart_test$Region)
 cart_test$Armed.Flag <- factor(cart_test$Armed.Flag)
+#cart_test$Median.Below.Poverty <- factor(cart_test$Median.Below.Poverty)
+#cart_test$Median.Income <- factor(cart_test$Median.Income)
+#cart_test$Over.25.Grad.Rate <- factor(cart_test$Over.25.Grad.Rate)
+
 ```
 
 ```{r}
 #import the C5.0 algorithm library
 library(rpart)
+library(rpart.plot)
 ```
 
 ```{r}
 #develop the CART algorithm 
-cart01 <- rpart(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = cart_training, method = "class")
+cart01 <- rpart(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + 
+                  Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = cart_training, 
+                method = "class")
 ```
 
 ```{r}
@@ -427,6 +458,10 @@ row.names(cart_contingency) <- c("Actual No", "Actual Yes")
 cart_contingency
 ```
 
+```{r}
+#plot the CART Algorithm
+rpart.plot(cart01)
+```
 ### C5.0 Algorithm  
 
 ```{r}
@@ -446,7 +481,9 @@ library(C50)
 
 ```{r}
 #develop the C5.0 algorithm 
-C5 <- C5.0(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = c50_train, minCases=50)
+C5 <- C5.0(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + 
+             Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = c50_train,
+           minCases=100)
 ```
 
 ```{r}
@@ -476,7 +513,9 @@ rf_test <- c50_test
 
 ```{r}
 #develop the random forests algorithm 
-rf01 <- randomForest(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = c50_train, ntree = 500, type = "classification")
+rf01 <- randomForest(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag +
+                       Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = c50_train, 
+                     ntree = 500, type = "classification")
 ```
 
 ```{r}
@@ -490,6 +529,9 @@ row.names(rf_contingency) <- c("Actual No", "Actual Yes")
 rf_contingency
 ```
 
+```{r}
+plot(rf01)
+```
 ### Navie Bayes Classifcation 
 ```{r}
 #import the Naive Bayes library
@@ -502,7 +544,9 @@ nb_test <- rf_test
 
 ```{r}
 #develop the random forests algorithm
-nb01 <- naiveBayes(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = nb_train)
+nb01 <- naiveBayes(formula = Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + 
+                     Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, 
+                   data = nb_train)
 ```
 
 ```{r}
@@ -527,23 +571,37 @@ ann_train <- nb_train
 ann_test <- nb_test
 
 #normalize the quantitative variables 
-ann_train$Median.Below.Poverty <- (ann_train$Median.Below.Poverty - min(ann_train$Median.Below.Poverty)) / (max(ann_train$Median.Below.Poverty) - min(ann_train$Median.Below.Poverty))
-ann_train$Median.Income <- (ann_train$Median.Income - min(ann_train$Median.Income)) / (max(ann_train$Median.Income) - min(ann_train$Median.Income))
-ann_train$Over.25.Grad.Rate <- (ann_train$Over.25.Grad.Rate - min(ann_train$Over.25.Grad.Rate)) / (max(ann_train$Over.25.Grad.Rate) - min(ann_train$Over.25.Grad.Rate))
+ann_train$Median.Below.Poverty <- (ann_train$Median.Below.Poverty - min(ann_train$Median.Below.Poverty)) / 
+  (max(ann_train$Median.Below.Poverty) - min(ann_train$Median.Below.Poverty))
+ann_train$Median.Income <- (ann_train$Median.Income - min(ann_train$Median.Income)) / 
+  (max(ann_train$Median.Income) - min(ann_train$Median.Income))
+ann_train$Over.25.Grad.Rate <- (ann_train$Over.25.Grad.Rate - min(ann_train$Over.25.Grad.Rate)) / 
+  (max(ann_train$Over.25.Grad.Rate) - min(ann_train$Over.25.Grad.Rate))
 
-ann_test$Median.Below.Poverty <- (ann_test$Median.Below.Poverty - min(ann_test$Median.Below.Poverty)) / (max(ann_test$Median.Below.Poverty) - min(ann_test$Median.Below.Poverty))
-ann_test$Median.Income <- (ann_test$Median.Income - min(ann_test$Median.Income)) / (max(ann_test$Median.Income) - min(ann_test$Median.Income))
-ann_test$Over.25.Grad.Rate <- (ann_test$Over.25.Grad.Rate - min(ann_test$Over.25.Grad.Rate)) / (max(ann_test$Over.25.Grad.Rate) - min(ann_test$Over.25.Grad.Rate))
+ann_test$Median.Below.Poverty <- (ann_test$Median.Below.Poverty - min(ann_test$Median.Below.Poverty)) / 
+  (max(ann_test$Median.Below.Poverty) - min(ann_test$Median.Below.Poverty))
+ann_test$Median.Income <- (ann_test$Median.Income - min(ann_test$Median.Income)) / 
+  (max(ann_test$Median.Income) - min(ann_test$Median.Income))
+ann_test$Over.25.Grad.Rate <- (ann_test$Over.25.Grad.Rate - min(ann_test$Over.25.Grad.Rate)) / 
+  (max(ann_test$Over.25.Grad.Rate) - min(ann_test$Over.25.Grad.Rate))
 ```
 
 ```{r}
 #develop the neural network
-nnet01 <- nnet(Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty + Median.Income + Over.25.Grad.Rate, data = ann_train, size = 2)
+nnet01 <- nnet(Is.Minority ~ signs_of_mental_illness + Region + Armed.Flag + Median.Below.Poverty +
+                 Median.Income + Over.25.Grad.Rate, data = ann_train, size = 1)
 ```
 
 ```{r}
 #plot the neural net
 plotnet(nnet01)
+```
+
+
+```{r}
+#obtain the weights of the ANN
+nnet01$wts
+print(nnet01)
 ```
 
 ```{r}
@@ -555,17 +613,17 @@ row.names(nn_contingency) <- c("Actual No", "Actual Yes")
 nn_contingency
 ```
 
-### Evaluation Metrics 
+### All Evaluation Metrics 
 ```{r}
 #display all contingency matrices
-cart_contigency
-c5_contingency
-rf_contigency
-nb_contignecy
-nn_contigency
+#cart_contingency
+#c5_contingency
+#rf_contingency
+#nb_contingency
+#nn_contingency
 ```
 
-#### CART Evaluation 
+#### Decision Tree CART Evaluation 
 ```{r}
 #develop the cart metrics to input into the confusion matrix
 TP_cart <- cart_contingency[1,1]
@@ -588,7 +646,7 @@ precision_cart <- round((TP_cart/TPP_cart),4)
 f1_cart <- round(2* ((precision_cart * specificity_cart) / (precision_cart + specificity_cart)),4) 
 ```
 
-#### C5.0 Evaluation
+#### Decision Tree C5.0 Evaluation
 ```{r}
 #develop the c5.0 metrics to input into the confusion matrix
 TP_c5 <- c5_contingency[1,1]
@@ -690,7 +748,7 @@ model_eval_table <- matrix(c(accuracy_cart, accuracy_c5, accuracy_nb, accuracy_r
                            ncol = 5, nrow =4, byrow = TRUE)
 
 #develop the column and row names
-colnames(model_eval_table) <- c("CART Model", "C5.0 Model", "Naive Bayes Model", "Random Forest Model","Neural Network Model")
+colnames(model_eval_table) <- c("CART", "C5.0", "Naive Bayes", "Random Forest","Neural Network")
 row.names(model_eval_table) <- c("Accuracy","Specificity","Precision","F1")
 
 print(model_eval_table)
