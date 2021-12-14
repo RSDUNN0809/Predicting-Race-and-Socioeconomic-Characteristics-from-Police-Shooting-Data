@@ -1,5 +1,5 @@
 # Project Title
- "Predicting the Socioeconomic Characteristics from Police Shooting Data"
+ "Predicting Race and Socioeconomic Characteristics from Police Shooting Data"
  
  This project is a part of the ADS-502 Applied Data Mining course in the Applied Data Science Program at the University of San Diego. 
  
